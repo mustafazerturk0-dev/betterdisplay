@@ -1,0 +1,5 @@
+dxcam
+PyQt5
+numpy
+opencv-python
+psutil
