@@ -1,12 +1,11 @@
-import kivy
+﻿import kivy
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.image import Image
+from kivy.uix.video import Video
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
-from stream import StreamReceiver
 import os
 
 Window.clearcolor = (0.07, 0.07, 0.07, 1)
@@ -15,11 +14,6 @@ class BTDSClient(App):
     def build(self):
         self.title = 'BetterDisplay (BTDS)'
         
-        # Try to set icon
-        icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets', 'icon.jpg'))
-        if os.path.exists(icon_path):
-            self.icon = icon_path
-
         self.root = BoxLayout(orientation='vertical', padding=20, spacing=15)
         
         self.header = Label(
@@ -31,7 +25,7 @@ class BTDSClient(App):
         self.root.add_widget(self.header)
         
         self.status_label = Label(
-            text='Status: Waiting for connection...',
+            text='Status: Ready',
             color=(0.7, 0.7, 0.7, 1),
             font_size='18sp',
             size_hint=(1, 0.1)
@@ -63,40 +57,28 @@ class BTDSClient(App):
         btn_layout.add_widget(self.btn_connect)
         self.root.add_widget(btn_layout)
         
-        self.video_display = Image(allow_stretch=True, keep_ratio=True, size_hint=(1, 0.55))
+        self.video_display = Video(allow_stretch=True, keep_ratio=True, size_hint=(1, 0.55))
         self.root.add_widget(self.video_display)
-        
-        self.receiver = None
         
         return self.root
 
     def toggle_connection(self, instance):
-        if self.receiver and self.receiver.is_running:
-            self.receiver.stop()
+        if self.video_display.state == 'play':
+            self.video_display.state = 'stop'
+            self.video_display.source = ''
+            self.btn_connect.text = 'Connect'
+            self.status_label.text = 'Status: Disconnected'
+            self.status_label.color = (0.7, 0.7, 0.7, 1)
         else:
             ip = self.ip_input.text
             port = 5000
             self.status_label.text = f'Connecting to {ip}:{port}...'
             self.btn_connect.text = 'Disconnect'
             
-            self.receiver = StreamReceiver(
-                ip=ip, 
-                port=port, 
-                image_widget=self.video_display,
-                on_connect=self.on_connected,
-                on_disconnect=self.on_disconnected
-            )
-            self.receiver.start()
-            
-    def on_connected(self):
-        self.status_label.text = '[color=00FF00]Status: Connected[/color]'
-        self.status_label.markup = True
-        
-    def on_disconnected(self):
-        self.status_label.text = 'Status: Disconnected'
-        self.status_label.markup = False
-        self.btn_connect.text = 'Connect'
-        self.video_display.texture = None
+            self.video_display.source = f'tcp://{ip}:{port}'
+            self.video_display.state = 'play'
+            self.status_label.text = '[color=00FF00]Status: Connected / Playing[/color]'
+            self.status_label.markup = True
 
 if __name__ == '__main__':
     BTDSClient().run()
