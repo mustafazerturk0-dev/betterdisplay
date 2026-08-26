@@ -17,7 +17,10 @@ fullscreen = 1
 android.permissions = INTERNET,ACCESS_NETWORK_STATE
 android.archs = arm64-v8a, armeabi-v7a
 
+android.ndk = 25b
+
 [buildozer]
 log_level = 2
 warn_on_root = 1
+
 
