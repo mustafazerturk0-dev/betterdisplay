@@ -6,7 +6,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
-requirements = python3,kivy,opencv-python-headless,numpy
+requirements = python3,kivy,opencv,numpy
 
 # Use the generated icon
 icon.filename = ../assets/icon.jpg
